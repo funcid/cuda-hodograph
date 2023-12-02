@@ -1,10 +1,10 @@
 #include <stdio.h>
-#define N (1024*1024)
+#define N (4096*4096)
 
 __global__ void kernel(float* dA) { 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   float x = 2.0f * 3.1415926f * (float) idx / (float) N;
-  dA [idx] = sinf(sqrtf(x));
+  dA[idx] = sinf(sqrtf(x));
 }
 
 bool checkLaunched() {
@@ -19,18 +19,44 @@ bool checkLaunched() {
 }
 
 int main(void) {
+  float timerValueGPU, timerValueCPU;
+  cudaEvent_t start, stop;
+  cudaEventCreate(&start);
+  cudaEventCreate(&stop);
+  cudaEventRecord(start, 0);
+  
   float *hA, *dA; int cudaCores = 1024;
-  hA = (float*) malloc (N * sizeof(float));
+  hA = (float*) malloc(N * sizeof(float));
   cudaMalloc((void**) &dA, N * sizeof(float));
   kernel <<< N / cudaCores, cudaCores >>> (dA);
   cudaMemcpy(hA, dA, N * sizeof(float), cudaMemcpyDeviceToHost);
 
   if (!checkLaunched()) return 1;
 
-  for (int idx = 0; idx < N; idx++) {
-    printf("a[%d] = %.5f\n", idx, hA[idx]);
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  cudaEventElapsedTime(&timerValueGPU, start, stop);
+  printf("\n GPU calculation time: %f ms\n", timerValueGPU);
+
+  //for (int idx = 0; idx < N; idx++) {
+  //  if (idx % 10000 == 0) {
+  //    printf("a[%d] = %.5f\n", idx, hA[idx]);
+  //  }
+  //}
+
+  cudaEventRecord(start, 0);
+  for (int i = 0; i < N; i++) {
+    hA[i] = sinf(sqrtf(2.0f * 3.1415926f * (float) i / (float) N));
   }
+  cudaEventRecord(stop, 0);
+  cudaEventSynchronize(stop);
+  cudaEventElapsedTime(&timerValueCPU, start, stop);
+  printf("\n CPU calculation time: %f ms\n", timerValueCPU);
+  printf("\n Rate: %fx\n", timerValueCPU / timerValueGPU);
+
   free(hA); cudaFree(dA);
-  
+  cudaEventDestroy(start);
+  cudaEventDestroy(stop);
+
   return 0;
 }
