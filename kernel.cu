@@ -1,5 +1,6 @@
 #include <stdio.h>
 #define N (4096*4096)
+#define CORES (1024)
 
 __global__ void kernel(float* dA) { 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -25,10 +26,10 @@ int main(void) {
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
   
-  float *hA, *dA; int cudaCores = 1024;
+  float *hA, *dA;
   hA = (float*) malloc(N * sizeof(float));
   cudaMalloc((void**) &dA, N * sizeof(float));
-  kernel <<< N / cudaCores, cudaCores >>> (dA);
+  kernel <<< N / CORES, CORES >>> (dA);
   cudaMemcpy(hA, dA, N * sizeof(float), cudaMemcpyDeviceToHost);
 
   if (!checkLaunched()) return 1;
