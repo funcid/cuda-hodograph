@@ -26,11 +26,13 @@ void checkCudaLaunched()
 
 void checkGlfwAndGlewInit() 
 {
-  if (!glfwInit()) {
+  if (!glfwInit()) 
+  {
     printf("Failed to initialize GLFW");
     exit(-389);
   }
-  if (!glewInit()) {
+  if (!glewInit())
+  {
     printf("Failed to initialize GLEW");
     exit(-340);
   }
@@ -52,7 +54,8 @@ void renderFrame(float* result)
   glVertex2f(0, -1);
   glEnd();
   glBegin(GL_LINE_STRIP);
-  for (int i = 0; i < N; i++) { 
+  for (int i = 0; i < N; i++) 
+  { 
     glVertex2f(2 * (i * 1.0 / N - 0.5), result[i]);
   }
   glEnd();
