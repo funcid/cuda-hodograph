@@ -1,14 +1,18 @@
 #include "render.h"
+#include "../globals/globals.h"
 #include <stdio.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+#define GLEW_ERROR (-389)
+#define GLFW_ERROR (-390)
 
 void checkGlewInit()
 {
   glewExperimental = GL_TRUE;
   if (glewInit() != GLEW_OK) {
     printf("Failed to initialize GLEW");
-    exit(-389);
+    exit(GLEW_ERROR);
   }
 }
 
@@ -17,7 +21,7 @@ void checkGlfwInit()
   if (!glfwInit()) 
   {
     printf("Failed to initialize GLFW");
-    exit(-390);
+    exit(GLFW_ERROR);
   } 
   else
   {
@@ -28,7 +32,7 @@ void checkGlfwInit()
   }
 }
 
-void renderFrame(float* result, int N) 
+void renderFrame(float* result) 
 {
   glBegin(GL_LINE_STRIP);
   glVertex2f(-1, 0);

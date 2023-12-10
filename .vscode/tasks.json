@@ -12,6 +12,8 @@
                 "-L${workspaceFolder}\\lib",
                 "${workspaceFolder}\\src\\main.cu",
                 "${workspaceFolder}\\src\\render\\render.cu",
+                "${workspaceFolder}\\src\\cuda\\cuda.cu",
+                "${workspaceFolder}\\src\\globals\\globals.cu",
                 "-lglfw3dll",
                 "-lglew32",
                 "-lopengl32",

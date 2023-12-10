@@ -1,0 +1,3 @@
+void checkCudaLaunched();
+
+float* call();

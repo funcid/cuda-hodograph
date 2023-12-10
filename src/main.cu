@@ -2,17 +2,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "render/render.h"
+#include "cuda/cuda.h"
 
 #define WIDTH (1000)
 #define HEIGHT (800)
-#define N (2048*2048)
-#define CORES (1024)
-
-__global__ void kernel(float* dA) 
-{ 
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  dA[idx] = 1.0 / (100 * (float) (idx - N / 2) / (float) N);
-}
 
 class VertexBufferObject
 {
@@ -50,17 +43,6 @@ public:
   }
 };
 
-void checkCudaLaunched() 
-{
-  cudaDeviceSynchronize();
-  cudaError_t err = cudaGetLastError();
-  if (err != cudaSuccess) 
-  {
-    fprintf(stderr, "Cannot launch CUDA kernel: %s\n", cudaGetErrorString(err));
-    exit(err);
-  } 
-}
-
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -77,11 +59,7 @@ int main(void)
   cudaEventCreate(&stop);
   cudaEventRecord(start, 0);
   
-  float *hostArray, *deviceArray;
-  hostArray = (float*) malloc(N * sizeof(float));
-  cudaMalloc((void**) &deviceArray, N * sizeof(float));
-  kernel<<< N / CORES, CORES >>>(deviceArray);
-  cudaMemcpy(hostArray, deviceArray, N * sizeof(float), cudaMemcpyDeviceToHost);
+  float* hostArray = call();
   checkCudaLaunched();
 
   cudaEventRecord(stop, 0);
@@ -89,7 +67,6 @@ int main(void)
   cudaEventElapsedTime(&timerValueGPU, start, stop);
   printf("GPU calculation time: %f ms\n", timerValueGPU);
 
-  cudaFree(deviceArray);
   cudaEventDestroy(start);
   cudaEventDestroy(stop);
 
@@ -115,7 +92,7 @@ int main(void)
   {
     glfwPollEvents();  
     glClear(GL_COLOR_BUFFER_BIT);
-    renderFrame(hostArray, N);
+    renderFrame(hostArray);
     glfwSwapBuffers(window);
   }
 
