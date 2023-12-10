@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "render/render.h"
 
 #define WIDTH (1000)
 #define HEIGHT (800)
@@ -60,43 +61,9 @@ void checkCudaLaunched()
   } 
 }
 
-void checkGlfwInit() 
-{
-  if (!glfwInit()) 
-  {
-    printf("Failed to initialize GLFW");
-    exit(-389);
-  } 
-  else
-  {
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-  }
-}
-
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-}
-
-void renderFrame(float* result) 
-{
-  glBegin(GL_LINE_STRIP);
-  glVertex2f(-1, 0);
-  glVertex2f(1, 0);
-  glEnd();
-  glBegin(GL_LINE_STRIP);
-  glVertex2f(0, 1);
-  glVertex2f(0, -1);
-  glEnd();
-  glBegin(GL_LINE_STRIP);
-  for (int i = 0; i < N; i++) 
-  { 
-    glVertex2f(2 * (i * 1.0 / N - 0.5), result[i]);
-  }
-  glEnd();
 }
 
 int main(void) 
@@ -135,13 +102,7 @@ int main(void)
   }
 
   glfwMakeContextCurrent(window);
-
-  glewExperimental = GL_TRUE;
-  if (glewInit() != GLEW_OK) {
-    printf("Failed to initialize GLEW");
-    exit(-390);
-  }
-
+  checkGlewInit();
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
   printf("Renderer: %s\n", glGetString(GL_RENDERER));
@@ -154,7 +115,7 @@ int main(void)
   {
     glfwPollEvents();  
     glClear(GL_COLOR_BUFFER_BIT);
-    renderFrame(hostArray);
+    renderFrame(hostArray, N);
     glfwSwapBuffers(window);
   }
 
