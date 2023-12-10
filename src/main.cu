@@ -13,6 +13,42 @@ __global__ void kernel(float* dA)
   dA[idx] = 1.0 / (100 * (float) (idx - N / 2) / (float) N);
 }
 
+class VertexBufferObject
+{
+private:
+  GLuint id;
+
+public:
+  VertexBufferObject()
+  {
+    glGenBuffers(1, &id);
+  }
+
+};
+
+class VertexArrayObject
+{
+private:
+  GLuint id;
+
+public:
+  void bind() 
+  {
+    glBindVertexArray(id);
+  }
+
+  void unbind() 
+  {
+    glBindVertexArray(0);
+  }
+
+  VertexArrayObject()
+  {
+    glGenVertexArrays(1, &id);
+    bind();
+  }
+};
+
 void checkCudaLaunched() 
 {
   cudaDeviceSynchronize();
@@ -24,17 +60,19 @@ void checkCudaLaunched()
   } 
 }
 
-void checkGlfwAndGlewInit() 
+void checkGlfwInit() 
 {
   if (!glfwInit()) 
   {
     printf("Failed to initialize GLFW");
     exit(-389);
-  }
-  if (!glewInit())
+  } 
+  else
   {
-    printf("Failed to initialize GLEW");
-    exit(-340);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
   }
 }
 
@@ -63,6 +101,8 @@ void renderFrame(float* result)
 
 int main(void) 
 {
+  checkGlfwInit();
+
   // CUDA calculations
   float timerValueGPU, timerValueCPU;
   cudaEvent_t start, stop;
@@ -76,7 +116,6 @@ int main(void)
   kernel<<< N / CORES, CORES >>>(deviceArray);
   cudaMemcpy(hostArray, deviceArray, N * sizeof(float), cudaMemcpyDeviceToHost);
   checkCudaLaunched();
-  checkGlfwAndGlewInit();
 
   cudaEventRecord(stop, 0);
   cudaEventSynchronize(stop);
@@ -96,11 +135,20 @@ int main(void)
   }
 
   glfwMakeContextCurrent(window);
-  glViewport(0, 0, WIDTH, HEIGHT);
+
+  glewExperimental = GL_TRUE;
+  if (glewInit() != GLEW_OK) {
+    printf("Failed to initialize GLEW");
+    exit(-390);
+  }
+
   glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
   printf("Renderer: %s\n", glGetString(GL_RENDERER));
   printf("OpenGL version: %s\n", glGetString(GL_VERSION));
+
+  // GL bind array
+  VertexArrayObject* object = new VertexArrayObject();
 
   while(!glfwWindowShouldClose(window)) 
   {
@@ -111,6 +159,7 @@ int main(void)
   }
 
   free(hostArray); 
+  delete object;
   glfwTerminate();
   return 0;
 }
