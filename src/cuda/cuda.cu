@@ -5,7 +5,7 @@
 __global__ void kernel(float* result, int N) 
 { 
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  result[idx] = 1.0 / (100 * (float) (idx - N / 2) / (float) N);
+  result[idx] = 1.0 / (100 * (float) (idx - N / 2) / (float) N); // todo: add custom function call
 }
 
 float* internalCall() 

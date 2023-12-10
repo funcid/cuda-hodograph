@@ -32,7 +32,7 @@ void checkGlfwInit()
   }
 }
 
-void renderFrame(float* result) 
+void renderFrame(float* result) // todo: rewrite with modern OpenGL
 {
   glBegin(GL_LINE_STRIP);
   glVertex2f(-1, 0);
