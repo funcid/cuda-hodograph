@@ -7,42 +7,6 @@
 #define WIDTH (1000)
 #define HEIGHT (800)
 
-class VertexBufferObject
-{
-private:
-  GLuint id;
-
-public:
-  VertexBufferObject()
-  {
-    glGenBuffers(1, &id);
-  }
-
-};
-
-class VertexArrayObject
-{
-private:
-  GLuint id;
-
-public:
-  void bind() 
-  {
-    glBindVertexArray(id);
-  }
-
-  void unbind() 
-  {
-    glBindVertexArray(0);
-  }
-
-  VertexArrayObject()
-  {
-    glGenVertexArrays(1, &id);
-    bind();
-  }
-};
-
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -71,9 +35,6 @@ int main(void)
   printf("Renderer: %s\n", glGetString(GL_RENDERER));
   printf("OpenGL version: %s\n", glGetString(GL_VERSION));
 
-  // GL bind array
-  VertexArrayObject* object = new VertexArrayObject();
-
   while(!glfwWindowShouldClose(window)) 
   {
     glfwPollEvents();  
@@ -83,7 +44,6 @@ int main(void)
   }
 
   free(hostArray); 
-  delete object;
   glfwTerminate();
   return 0;
 }
