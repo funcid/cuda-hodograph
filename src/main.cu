@@ -53,22 +53,8 @@ int main(void)
   checkGlfwInit();
 
   // CUDA calculations
-  float timerValueGPU, timerValueCPU;
-  cudaEvent_t start, stop;
-  cudaEventCreate(&start);
-  cudaEventCreate(&stop);
-  cudaEventRecord(start, 0);
-  
-  float* hostArray = call();
+  float* hostArray = calculate();
   checkCudaLaunched();
-
-  cudaEventRecord(stop, 0);
-  cudaEventSynchronize(stop);
-  cudaEventElapsedTime(&timerValueGPU, start, stop);
-  printf("GPU calculation time: %f ms\n", timerValueGPU);
-
-  cudaEventDestroy(start);
-  cudaEventDestroy(stop);
 
   // Windows application open
   GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Hodograph", NULL, NULL);

@@ -1,3 +1,3 @@
 void checkCudaLaunched();
 
-float* call();
+float* calculate();
