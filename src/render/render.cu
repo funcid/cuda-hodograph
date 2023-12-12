@@ -7,6 +7,8 @@
 #define GLEW_ERROR (-389)
 #define GLFW_ERROR (-390)
 
+GLuint vao, vbo;
+
 void checkGlewInit()
 {
   glewExperimental = GL_TRUE;
@@ -32,20 +34,28 @@ void checkGlfwInit()
   }
 }
 
-void renderFrame(float* result) // todo: rewrite with modern OpenGL
+void renderFrame(float* result) 
 {
-  glBegin(GL_LINE_STRIP);
-  glVertex2f(-1, 0);
-  glVertex2f(1, 0);
-  glEnd();
-  glBegin(GL_LINE_STRIP);
-  glVertex2f(0, 1);
-  glVertex2f(0, -1);
-  glEnd();
-  glBegin(GL_LINE_STRIP);
-  for (int i = 0; i < N; i++) 
-  { 
-    glVertex2f(2 * (i * 1.0 / N - 0.5), result[i]);
-  }
-  glEnd();
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+  glBufferData(GL_ARRAY_BUFFER, N * sizeof(float), result, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  glBindVertexArray(vao);
+
+  glDrawArrays(GL_LINE_STRIP, 0, N);
+
+  glBindVertexArray(0);
+
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
 }
