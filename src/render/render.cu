@@ -7,8 +7,6 @@
 #define GLEW_ERROR (-389)
 #define GLFW_ERROR (-390)
 
-GLuint vao, vbo;
-
 void checkGlewInit()
 {
   glewExperimental = GL_TRUE;
@@ -34,11 +32,13 @@ void checkGlfwInit()
   }
 }
 
-void renderFrame(float* result) 
+void renderFrame(float* result)
 {
+  GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
+  GLuint vbo;
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -51,11 +51,10 @@ void renderFrame(float* result)
   glBindVertexArray(0);
 
   glBindVertexArray(vao);
-
   glDrawArrays(GL_LINE_STRIP, 0, N);
-
   glBindVertexArray(0);
 
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(1, &vbo);
 }
+
