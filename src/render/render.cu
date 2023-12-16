@@ -34,6 +34,18 @@ void checkGlfwInit()
 
 void renderFrame(float* result)
 {
+  GLuint vertexShader = compileShader("src/shaders/vertexShader.glsl", GL_VERTEX_SHADER);
+  GLuint fragmentShader = compileShader("src/shaders/fragmentShader.glsl", GL_FRAGMENT_SHADER);
+
+  GLuint shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glLinkProgram(shaderProgram);
+  glUseProgram(shaderProgram);
+
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+  
   GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
