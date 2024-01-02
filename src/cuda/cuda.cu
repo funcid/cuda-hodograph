@@ -37,7 +37,15 @@ float* calculate()
     cudaEventDestroy(start);
     cudaEventDestroy(stop);
 
-    return hostArray;
+    float* data = new float[N * 2];
+    for (int i = -N; i < N; i += 2)
+    {
+      data[N + i] = i * 1.0 / N;
+      data[N + i + 1] = hostArray[(N + i) / 2];
+    }
+
+    delete hostArray;
+    return data;
 }
 
 void checkCudaLaunched() 

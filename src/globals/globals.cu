@@ -1,7 +1,7 @@
 #include "globals.h"
 
-int N = 2048 * 2048;
-int CORES = 1024;
+const int N = 2048 * 2048;
+const int CORES = 1024;
 
 /*
 More information: https://www.nvidia.com/ru-ru/geforce/graphics-cards/compare/
