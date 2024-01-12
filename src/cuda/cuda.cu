@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <cassert>
+
 #include "cuda.h"
 #include "../globals/globals.h"
 
@@ -38,8 +40,7 @@ float* calculate()
     cudaEventDestroy(stop);
 
     float* data = new float[N * 2];
-    for (int i = -N; i < N; i += 2)
-    {
+    for (int i = -N; i < N; i += 2) {
       data[N + i] = i * 1.0 / N;
       data[N + i + 1] = hostArray[(N + i) / 2];
     }
@@ -52,9 +53,5 @@ void checkCudaLaunched()
 {
   cudaDeviceSynchronize();
   cudaError_t err = cudaGetLastError();
-  if (err != cudaSuccess) 
-  {
-    fprintf(stderr, "Cannot launch CUDA kernel: %s\n", cudaGetErrorString(err));
-    exit(err);
-  } 
+  assert(err == cudaSuccess && "Cannot launch CUDA kernel " && cudaGetErrorString(err));
 }

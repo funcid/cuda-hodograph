@@ -1,19 +1,15 @@
-#include "render.h"
 #include <stdio.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "../globals/globals.h"
+#include <cassert>
 
-#define GLEW_ERROR (-389)
-#define GLFW_ERROR (-390)
+#include "render.h"
+#include "../globals/globals.h"
 
 void checkGlewInit()
 {
   glewExperimental = GL_TRUE;
-  if (glewInit() != GLEW_OK) {
-    printf("Failed to initialize GLEW");
-    exit(GLEW_ERROR);
-  }
+  assert(glewInit() == GLEW_OK && "Failed to initialize GLEW");
 }
 
 void openglSetup() 
@@ -26,15 +22,8 @@ void openglSetup()
 
 void checkGlfwInit() 
 {
-  if (!glfwInit()) 
-  {
-    printf("Failed to initialize GLFW");
-    exit(GLFW_ERROR);
-  } 
-  else
-  {
-    openglSetup();
-  }
+  assert(glfwInit() && "Failed to initialize GLFW");
+  openglSetup();
 }
 
 void renderFrame(float* result)
